@@ -1,0 +1,55 @@
+﻿@model MemberCompleteModel
+@{
+    var signUrl = Model.RefererSite.SignInUrl;
+    var findPWUrl = Model.RefererSite.FindPWUrl;
+    if (Model.IsMobile)
+    {
+        signUrl = Model.RefererSite.MobileSignInUrl;
+        findPWUrl = Model.RefererSite.MobileFindPWUrl;
+    }
+}
+<section class="register">
+    <div class="area">
+        <div class="register_complete">
+            <div class="register_title">
+                <h1>
+                    <span>회원님은 @Model.UserId 아이디로<br /> 가입되어 있습니다.</span>
+                </h1>
+                <p class="sub_text">위의 아이디로 로그인 해주시기 바랍니다. <br /> 비밀번호가 기억나지 않으시면 비밀번호 찾기를 클릭해 주세요.</p>
+            </div>
+            <div class="register_contents">
+                <div class="register_section">
+                    <div class="btn_box big">
+                        <a href="@signUrl" target="_parent" class="btn type02">로그인 하기</a>
+                        <a href="@findPWUrl" target="_parent" class="btn type01">비밀번호찾기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<input type="hidden" asp-for="Message" class="txtMessage" />
+@section Scripts {
+    <script>
+        $(function () {
+            if ($(".txtMessage").val() != "") {
+                var conf = {
+                    title: "룰렛 이벤트",
+                    typeAnimated: true,
+                    boxWidth: '80%',
+                    useBootstrap: false,
+                    content: $(".txtMessage").val(),
+                    buttons: {
+                        "확인": {
+                            btnClass: 'btn-blue',
+                            action: function () {
+
+                            }
+                        }
+                    }
+                };
+                $.confirm(conf);
+            }
+        });
+    </script>
+}

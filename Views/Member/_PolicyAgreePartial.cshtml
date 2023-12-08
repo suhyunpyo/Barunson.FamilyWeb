@@ -1,0 +1,96 @@
+﻿@model MemberRegModel
+
+<div class="form_checkbox">
+    <!-- 전체 동의-->
+    <input type="checkbox" asp-for="PolicyAgree.All" class="policiesAgreeAll" />
+    <label asp-for="PolicyAgree.All" class="policy_all_type01">전체 동의</label>
+</div>
+<div class="form_checkbox">
+    <!-- 만 14세 이상 가입동의-->
+    <input type="checkbox" asp-for="PolicyAgree.Age" class="policyCheck" />
+    <label asp-for="PolicyAgree.Age">만 14세 이상입니다. <span>(필수)</span></label>
+    <span asp-validation-for="PolicyAgree.Age"></span>
+</div>
+<div id="div_PolicyAgree_User" class="form_checkbox">
+    <!-- 바른컴퍼니 바른 ONE 서비스 이용약관동의-->
+    <input type="checkbox" asp-for="PolicyAgree.User" class="policyCheck" />
+    <label asp-for="PolicyAgree.User">이용약관 동의 <span>(필수)</span></label>
+    <button type="button" class="policyAgreeBtn" data-viewid="div_PolicyAgree_User">+</button>
+    <span asp-validation-for="PolicyAgree.User"></span>
+</div>
+<div id="div_PolicyAgree_Essential" class="form_checkbox">
+    <!-- 개인정보 수집 이용 동의-->
+    <input type="checkbox" asp-for="PolicyAgree.Essential" class="policyCheck" />
+    <label asp-for="PolicyAgree.Essential">개인정보 수집 이용 동의 <span>(필수)</span></label>
+    <button type="button" class="policyAgreeBtn" data-viewid="div_PolicyAgree_Essential">+</button>
+    <span asp-validation-for="PolicyAgree.Essential"></span>
+</div>
+<div id="div_PolicyAgree_SMSEMail" class="form_checkbox">
+    <!-- 이벤트및 서비스안내 수신동의-->
+    <input type="checkbox" asp-for="PolicyAgree.SMSEMail" class="policyCheck" />
+    <label asp-for="PolicyAgree.SMSEMail">이벤트 및 서비스안내 수신동의 <span>(선택)</span></label>
+    <button type="button" class="policyAgreeBtn" data-viewid="div_PolicyAgree_SMSEMail">+</button>
+</div>
+<div id="div_PolicyAgree_LGMembership" class="form_checkbox">
+    <!--LG 전자 동의-->
+    <input type="checkbox" asp-for="PolicyAgree.LGMembership" class="policyCheck lgPolicyCheckAll" />
+    <label asp-for="PolicyAgree.LGMembership">LG전자 멤버십 전체 이용 약관 동의 <span>(선택)</span></label>
+    <button type="button" class="policyAgreeBtn" data-viewid="div_PolicyAgree_LGMembership">+</button>
+</div>
+<div id="div_PolicyAgree_CasamiaMembership" class="form_checkbox">
+    <!--까사미아 멤버십 동의-->
+    <input type="checkbox" asp-for="PolicyAgree.CasamiaMembership" class="policyCheck casamiaPolicyCheckAll" />
+    <label asp-for="PolicyAgree.CasamiaMembership">까사미아 멤버십 전체 이용약관 동의 <span>(선택)</span></label>
+    <button type="button" class="policyAgreeBtn" data-viewid="div_PolicyAgree_CasamiaMembership">+</button>
+</div>
+<div id="div_PolicyAgree_ThirdParty" class="form_checkbox">
+    <!--통신서비스 마케팅 활용 동의 동의-->
+    <input type="checkbox" asp-for="PolicyAgree.ThirdParty" class="policyCheck ThirdPartyPolicyCheckAll" />
+    <label asp-for="PolicyAgree.ThirdParty">제3자 마케팅 활용동의 <span>(선택)</span></label>
+    <input type="checkbox" asp-for="PolicyAgree.ThirdPartyShinhan" class="ThirdPartyPolicyCheck" />
+    <label asp-for="PolicyAgree.ThirdPartyShinhan">라이프</label>
+    <input type="checkbox" asp-for="PolicyAgree.ThirdPartyTelecom" class="ThirdPartyPolicyCheck" />
+    <label asp-for="PolicyAgree.ThirdPartyTelecom">통신</label>
+    <button type="button" class="policyAgreeBtn" data-viewid="div_PolicyAgree_ThirdParty">+</button>
+
+</div>
+
+<div class="layerPop">
+    <div class="layerContent">
+        <div class="layerPopHeader">
+            <div class="policyTitle">
+                <h3></h3>
+            </div>
+            <div class="policyClose">
+                <button type="button" class="close">X</button>
+            </div>
+        </div>
+        <div class="layerPopBody">
+            <div class="policyText">
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="policyList">
+    <div class="policyData div_PolicyAgree_User">
+        @Html.Raw(Model.Policies.FirstOrDefault(m => m.PolicyDivision == "U")?.Contents)
+        <p style="margin-top:14px;"><a asp-action="PolicyHistory" asp-route-PolicyDivision="U" class="policy_button" target="_blank">이전 약관 내용 보기</a></p>
+    </div>
+    <div class="policyData div_PolicyAgree_Essential">
+        @Html.Raw(Model.Policies.FirstOrDefault(m => m.PolicyDivision == "P")?.Contents)
+        <p style="margin-top:14px;"><a asp-action="PolicyHistory" asp-route-PolicyDivision="P" class="policy_button" target="_blank">이전 약관 내용 보기</a></p>
+    </div>
+    <div class="policyData div_PolicyAgree_SMSEMail">
+        <partial name="/Views/Policy/_SMSEMailPolicy.cshtml" />
+    </div>
+    <div class="policyData div_PolicyAgree_LGMembership">
+        <partial name="/Views/Policy/_LGMembershipPolicy.cshtml" />
+    </div>
+    <div class="policyData div_PolicyAgree_CasamiaMembership">
+        <partial name="/Views/Policy/_CasamiaMembershipPolicy.cshtml" />
+    </div>
+    <div class="policyData div_PolicyAgree_ThirdParty">
+        <partial name="/Views/Policy/_ThirdPartyPolicy.cshtml" />
+    </div>
+</div>

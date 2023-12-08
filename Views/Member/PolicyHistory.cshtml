@@ -1,0 +1,31 @@
+﻿@model PolicyHistoryModel
+@section Styles {
+    <style>
+        
+    </style>
+}
+<section class="policyHistory">
+    <div class="policy_title">
+        <h1>@Html.Raw(Model.Title)</h1>
+        <form asp-action="PolicyHistory" class="frmPolilcy" method="get">
+            <input type="hidden" asp-for="PolicyDivision" />
+            <select asp-for="Seq" asp-items="Model.SelectSeqs" class="policy_select"></select>
+        </form>
+    </div>
+    <div class="policy_contents">
+        @Html.Raw(Model.Contents)
+    </div>
+    <div class="footerlogo">
+        <img src="@Model.RefererSite.LogUrl" alt="@Model.RefererSite.Brand" />
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('.policy_select').on('change', function () {
+                $(".frmPolilcy").trigger("submit");
+            });
+        });
+    </script>
+}

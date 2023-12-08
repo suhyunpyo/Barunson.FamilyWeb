@@ -1,5 +1,7 @@
 using Azure.Identity;
 using Barunson.DbContext;
+using Barunson.FamilyWeb.Models;
+using Barunson.FamilyWeb.Service;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +25,12 @@ builder.Services.AddDbContext<BarunsonContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BarunsonDBConn")));
 builder.Services.AddDbContext<BarShopContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("BarShopDBConn")));
+
+builder.Services.AddHttpClient();
+
+builder.Services.AddScoped<INiceCPClientService, NiceCPClientService>();
+builder.Services.AddScoped<IRouletteEventService, RouletteEventService>();
+builder.Services.AddSingleton<List<SiteInfo>>(builder.Configuration.GetSection("SiteInfos").Get<List<SiteInfo>>());
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddHealthChecks();

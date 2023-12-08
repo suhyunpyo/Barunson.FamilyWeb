@@ -32,7 +32,7 @@ builder.Services.AddScoped<INiceCPClientService, NiceCPClientService>();
 builder.Services.AddScoped<IRouletteEventService, RouletteEventService>();
 builder.Services.AddSingleton<List<SiteInfo>>(builder.Configuration.GetSection("SiteInfos").Get<List<SiteInfo>>());
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();

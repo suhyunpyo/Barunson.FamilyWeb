@@ -1,0 +1,18 @@
+@charset "UTF-8";
+
+.jconfirm * {
+    font-family: "Pretendard";
+}
+
+.jconfirm .jconfirm-holder {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.jconfirm .jconfirm-content {
+    line-height: 24px;
+}
+
+.jconfirm .jconfirm-buttons .btn {
+    font-weight: 400 !important;
+}

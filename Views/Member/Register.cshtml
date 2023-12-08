@@ -1,0 +1,407 @@
+﻿@model MemberRegModel
+@section Styles {
+    <link href="~/lib/datepicker/datepicker.min.css" rel="stylesheet" />
+    <link href="~/lib/swiper/swiper-bundle.min.css" rel="stylesheet" />
+    <link href="~/css/datepicker_custom.css" rel="stylesheet" />
+    <link href="~/css/jconfirm_custom.css" rel="stylesheet" />
+    <style>
+        .validesummary { display:none;}
+    </style>
+}
+<section class="register">
+    <div class="area">
+        <div class="register_contents_wrap contents_box">
+            <div class="step_view">
+                <ol>
+                    <li>
+                        <span>1</span>
+                        <h2>본인인증</h2>
+                    </li>
+                    <li class="on">
+                        <span>2</span>
+                        <h2>정보입력</h2>
+                    </li>
+                    <li>
+                        <span>3</span>
+                        <p>가입완료</p>
+                    </li>
+                </ol>
+            </div>
+            <form asp-action="RegisterSave" method="post" class="frmRegist">
+                <div class="register_contents">
+                    @Html.AntiForgeryToken()
+                    <ul class="register_contents_list">
+                        <li>
+                            <h3 class="required"><label asp-for="Name"></label></h3>
+                            <div class="register_box">
+                                <input asp-for="Name" readonly="readonly" />
+                                <span asp-validation-for="Name"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <h3 class="required"><label asp-for="BirthDay"></label></h3>
+                            <div class="register_box">
+                                <div class="grid_box type_date">
+                                    <div>
+                                        <input asp-for="BirthDay" type="text" readonly="readonly" data-toggle="datepicker" />
+                                        <span asp-validation-for="BirthDay"></span>
+                                    </div>
+                                    <div class="form_radio">
+                                        @foreach (var rd in Model.SolarOrLunarSelect)
+                                        {
+                                            <input type="radio" asp-for="SolarOrLunar" value="@rd.Value" id="SolarOrLunar_@rd.Value" />
+                                            <label for="SolarOrLunar_@rd.Value">@rd.Text</label>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </li>   
+                        <li>
+                            <h3 class="required"><label asp-for="UserId"></label></h3>
+                            <div class="register_box">
+                                <input asp-for="UserId"/>
+                                <span asp-validation-for="UserId"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <h3 class="required"><label asp-for="Password"></label></h3>
+                            <div class="register_box">
+                                <input asp-for="Password" />
+                                <span asp-validation-for="Password"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <h3 class="required"><label asp-for="PasswordConfirm"></label></h3>
+                            <div class="register_box">
+                                <input asp-for="PasswordConfirm" />
+                                <span asp-validation-for="PasswordConfirm"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <h3 class="required"><label asp-for="PostCode"></label></h3>
+                            <div class="register_box">
+                                <div class="grid_box type02">
+                                    <input asp-for="PostCode" readonly="readonly" class="post-postcode1" />
+                                    <div class="btn_box">
+                                        <button type="button" id="btnSearchPost" class="btn type01" postcode-index="0" postcode-type="zonecode" postcode-input-cnt="1">우편번호 검색</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <input asp-for="Address" class="post-address" readonly="readonly" />
+                                    <span asp-validation-for="PostCode"></span>
+                                </div>
+                                <div>
+                                    <input asp-for="AddressDetail" />
+                                    <span asp-validation-for="AddressDetail"></span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <h3><label asp-for="TelNo1"></label></h3>
+                            <div class="register_box">
+                                <div class="grid_box type03">
+                                    <select asp-for="TelNo1" asp-items="@Model.TelNo1Select"></select>
+                                    <input asp-for="TelNo2" />
+                                    <input asp-for="TelNo3" />
+                                </div>
+                                <span asp-validation-for="TelNo2"></span>
+                                <span asp-validation-for="TelNo3"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <h3 class="required"><label asp-for="MoTelNo1"></label></h3>
+                            <div class="register_box">
+                                <div class="grid_box type03">
+                                    <select asp-for="MoTelNo1" asp-items="@Model.MoTelNo1Select" readonly="readonly"></select>
+                                    <input asp-for="MoTelNo2" readonly="readonly" />
+                                    <input asp-for="MoTelNo3" readonly="readonly" />
+                                </div>
+                                <span asp-validation-for="MoTelNo2"></span>
+                                <span asp-validation-for="MoTelNo3"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <h3 class="required"><label asp-for="Email"></label></h3>
+                            <div class="register_box">
+                                <input asp-for="Email" />
+                                <span asp-validation-for="Email"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <h3 class="required"><label asp-for="WeddingDay"></label></h3>
+                            <div class="register_box">
+                                <input asp-for="WeddingDay" type="text" readonly="readonly" data-toggle="datepicker" />
+                                <span asp-validation-for="WeddingDay"></span>
+                            </div>
+                        </li>
+                        <li>
+                            <h3 class="required pt0"><label asp-for="WeddingHallType"></label></h3>
+                            <div class="register_box">
+                                <div class="form_radio">
+                                    <ul class="form_radio_list">
+                                        @foreach (var item in Model.WeddingHallTypeSelect)
+                                        {
+                                            <li>
+                                                <input type="radio" asp-for="WeddingHallType" value="@item.Value" id="WeddingHallType_@item.Value" />
+                                                <label for="WeddingHallType_@item.Value">@item.Text</label>
+                                            </li>
+                                        }
+                                    </ul>
+                                    <span asp-validation-for="WeddingHallType"></span>
+                                </div>
+                            
+                            </div>
+                        </li>
+                        <li>
+                            <h3><label asp-for="WeddingHallName"></label></h3>
+                            <div class="register_box">
+                                <input asp-for="WeddingHallName" />
+                                <span asp-validation-for="WeddingHallName"></span>
+                            </div>
+                        </li>
+                    </ul>
+                    <input type="hidden" asp-for="CertId" />
+                    <input type="hidden" asp-for="ViewType" />
+                    
+                </div>
+                <div class="register_check_contents">
+                    @{
+                        var policyVIewName = $"_PolicyAgree{Model.ViewType}Partial";
+                    }
+                    <partial name="@policyVIewName" model="Model" />
+                </div>
+                @if (Model.ViewType == MemberViewType.Type1)
+                {
+                <div class="barunnfamily_notice">
+                    <dl>
+                        <dt>알고 계세요</dt>
+                        <dd>청첩장 및 감사장 할인쿠폰은 약관 전체 동의 시 발급됩니다.</dd>
+                    </dl>
+				</div>
+                <!--배너-->
+                <div class="member_slide swiper-container">
+                    <ul class="swiper-wrapper">
+                        @foreach(var banner in Model.Banners)
+                        {
+                            <li class="swiper-slide">
+                                @if (banner.LinkUrl == null)
+                                {
+                                    <img src="@banner.ImageUrl" alt="@banner.CardText">
+                                }
+                                else
+                                {
+                                    <a href="@banner.LinkUrl" target="@banner.LinkTarget">
+                                        <img src="@banner.ImageUrl" alt="@banner.CardText">
+                                    </a>
+                                }
+                            </li>
+                        }
+                    </ul>
+                    <div class="swiper-pagination"></div>
+                </div>
+                <div>
+                    <button type="button" class="btn register_btn">가입완료</button>
+                </div>
+
+                }
+                else if (Model.ViewType == MemberViewType.Type2)
+                {
+                <div>
+                    <button type="button" class="btn register_btn">가입완료하기</button>
+                </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.ValidMessage))
+                {
+                <div>
+                    <span class="field-validation-error">@Model.ValidMessage</span>
+                </div>
+                }
+                <div asp-validation-summary="All" class="validesummary"></div>
+
+            </form>
+        </div>
+    </div>
+</section>
+<input type="hidden" id="checkUserIdUrl" value="@Url.Action("CheckUserId")" />
+<input type="hidden" value="@Model.RefererSite.SiteGubun" class="siteGubun" />
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/lib/datepicker/datepicker.min.js"></script>
+    <script src="~/lib/datepicker/i18n/datepicker.ko-kr.min.js"></script>
+    <script src="~/lib/swiper/swiper-bundle.min.js"></script>
+    <script src='https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'></script>
+    <script src="~/js/daumpostcode.js" asp-append-version="true"></script>
+
+	<script>
+        $(function () {
+
+            $('[data-toggle="datepicker"]').datepicker({
+                language: 'ko-KR',
+                format: 'yyyy-mm-dd',
+                autoHide: true
+            });
+
+
+            $('#btnSearchPost').on('click', function () {
+                $(this).postcode();
+                return false;
+            });
+
+            //약관 팝업
+            $('.policyAgreeBtn').on('click', function () {
+                var viewid = $(this).data('viewid');
+                var policydiv = $('#' + viewid);
+                $('.layerPop .layerPopHeader .policyTitle').find('h3').html($(policydiv).find('label').html());
+                $('.layerPop .layerPopBody').find('.policyText').html($('.policyList > div.' + viewid).html());
+                $('.layerPop .layerPopBody').scrollTop(0);
+
+                //LG동의
+                $('.layerPop .lgPolicyCheck').prop('checked', $(".lgPolicyCheckAll").prop('checked'));
+                //까사미아
+                $('.layerPop .casamiaPolicyCheck').prop('checked', $(".casamiaPolicyCheckAll").prop('checked'));
+
+                $('.layerPop').show();
+            });
+
+            $('.layerPop .close').on('click', function () {
+                $('.layerPop .layerPopHeader .policyTitle').find('h3').html('');
+                $('.layerPop .layerPopBody').find('.policyText').html('');
+                $('.layerPop').hide();
+            });
+
+            // 전체를 클릭하면 나머지 체크박스 전부 체크 처리
+            $('.policiesAgreeAll').on('change', function () {
+                var _checked = $(this).prop('checked');
+                $('.policyCheck').prop('checked', _checked);
+
+                //3자동의는 따로계산
+                $('.ThirdPartyPolicyCheck').prop('checked', _checked);
+            });
+            //각 체크박스를 모두 클릭하면 전체체크박스 자동 체크 / 해제
+            $('.policyCheck').on('change', function () {
+                var _checked = $(".policyCheck").length == $(".policyCheck:checked").length;
+                $(".policiesAgreeAll").prop("checked", _checked);
+            });
+
+            //LG 동의
+            $('.layerPop').on('change', '.lgPolicyCheck', function () {
+                var _checked = $(".layerPop .lgPolicyCheck").length == $(".layerPop .lgPolicyCheck:checked").length;
+                $(".lgPolicyCheckAll").prop("checked", _checked);
+
+                $('.policyCheck').trigger('change');
+            });
+
+            //까사미아 동의
+            $('.layerPop').on('change', '.casamiaPolicyCheck', function () {
+                var _checked = $(".layerPop .casamiaPolicyCheck").length == $(".layerPop .casamiaPolicyCheck:checked").length;
+                $(".casamiaPolicyCheckAll").prop("checked", _checked);
+
+                $('.policyCheck').trigger('change');
+            });
+            //제 3자동의
+            $('.ThirdPartyPolicyCheckAll').on('change', function () {
+                $('.ThirdPartyPolicyCheck').prop('checked', $(".ThirdPartyPolicyCheckAll").prop('checked'));
+            });
+
+            //제 3자 동의는 하휘 한개만 선택 해도 동의 됨.
+            $('.ThirdPartyPolicyCheck').on('change', function () {
+                var _checked = $(".ThirdPartyPolicyCheck:checked").length > 0;
+                $('.ThirdPartyPolicyCheckAll').prop('checked', _checked);
+
+                //3자동의는 따로계산
+                var _checked = $(".policyCheck").length == $(".policyCheck:checked").length;
+                $(".policiesAgreeAll").prop("checked", _checked);
+            });
+            //배너 슬라이드
+            if ($('.member_slide .swiper-slide').length >= 1) {
+                $('.member_slide').show();
+
+                var memberSlide = new Swiper('.member_slide', {
+                    slidesPerView: 1,
+                    loop: true,
+                    autoplay: {
+                        delay: 2500,
+                        disableOnInteraction: false,
+                    },
+                    pagination: {
+                        el: '.swiper-pagination',
+                        clickable: true,
+                    },
+                });
+            } else {
+                $('.member_slide').hide();
+            }
+
+            $('.register_btn').on('click', function () {
+                var check = $('.frmRegist').valid();
+                console.log('form vaild check:' + check);
+                if (check) {
+                    var agreeAll = $(".policiesAgreeAll").is(":checked");
+                    if ($('input.siteGubun').val() == "SB" && agreeAll == false) {  //바른손 카드만,
+                        var conf = {
+                            title: "",
+                            typeAnimated: true,
+                            boxWidth: '80%',
+                            useBootstrap: false,
+                            content: '모든 약관에 전체 동의 하시면 할인쿠폰을 드립니다.<br />동의하시겠습니까?',
+                            buttons: {
+                                "예": {
+                                    btnClass: 'btn-blue',
+                                    action: function () {
+                                        $(".policiesAgreeAll").prop("checked", true);
+                                        $('.policiesAgreeAll').trigger('change');
+
+                                        $('.frmRegist').trigger('submit');
+                                    },
+                                },
+                                "아니요": {
+                                    //btnClass: 'btn-red',
+                                    action: function () {
+                                        $('.frmRegist').trigger('submit');
+                                    }
+                                }
+                            }
+                        };
+                        $.confirm(conf);
+                    } else {
+                        $('.frmRegist').trigger('submit');
+                    }
+                } else {
+                    var conf = {
+                        title: "",
+                        typeAnimated: true,
+                        boxWidth: '80%',
+                        useBootstrap: false,
+                        content: $(".validesummary").html(),
+                        buttons: {
+                            "확인": {
+                                btnClass: 'btn-blue'
+                            }
+                        }
+                    };
+                    $.confirm(conf);
+                }
+            });
+            
+            
+        });
+
+        $(function ($) {
+            $.validator.addMethod("mustbetrue", function (value, element, param) {
+                console.log($(element).is(':checked'));
+
+                if ($(element).is(':checked')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            });
+
+            $.validator.unobtrusive.adapters.add('mustbetrue', [], function (options) {
+                options.rules['mustbetrue'] = "#" + options.element.name.replace('.', '_');
+                options.messages['mustbetrue'] = options.message;
+            });
+        }(jQuery));
+	</script>
+}

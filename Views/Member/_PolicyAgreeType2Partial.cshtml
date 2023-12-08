@@ -1,0 +1,40 @@
+﻿@model MemberRegModel
+<div class="form_checkbox mb0">
+    <!-- 전체 동의-->
+    <input type="checkbox" asp-for="PolicyAgree.All" class="policiesAgreeAll" />
+    <label asp-for="PolicyAgree.All"></label>
+</div>
+<div class="form_checkbox">
+    <!-- 만 14세 이상 가입동의-->
+    <input type="checkbox" asp-for="PolicyAgree.Age" class="policyCheck" />
+    <label asp-for="PolicyAgree.Age"></label>
+    <span asp-validation-for="PolicyAgree.Age"></span>
+</div>
+<div class="form_checkbox">
+    <!-- 바른컴퍼니 바른 ONE 서비스 이용약관동의-->
+    <input type="checkbox" asp-for="PolicyAgree.User" class="policyCheck" />
+    <label asp-for="PolicyAgree.User">이용약관 동의 <span>(필수)</span></label>
+    <span asp-validation-for="PolicyAgree.User"></span>
+    <div class="policyDataBox">
+        @Html.Raw(Model.Policies.FirstOrDefault(m => m.PolicyDivision == "U").Contents)
+        <p style="margin-top:14px;"><a asp-action="PolicyHistory" asp-route-PolicyDivision="U" class="policy_button" target="_blank">이전 약관 내용 보기</a></p>
+    </div>
+</div>
+<div id="div_PolicyAgree_Essential" class="form_checkbox">
+    <!-- 개인정보 수집 이용 동의-->
+    <input type="checkbox" asp-for="PolicyAgree.Essential" class="policyCheck" />
+    <label asp-for="PolicyAgree.Essential">개인정보 수집 이용 동의 <span>(필수)</span></label>
+    <span asp-validation-for="PolicyAgree.Essential"></span>
+    <div class="policyDataBox">
+        @Html.Raw(Model.Policies.FirstOrDefault(m => m.PolicyDivision == "P").Contents)
+        <p style="margin-top:14px;"><a asp-action="PolicyHistory" asp-route-PolicyDivision="P" class="policy_button" target="_blank">이전 약관 내용 보기</a></p>
+    </div>
+</div>
+<div id="div_PolicyAgree_SMSEMail" class="form_checkbox">
+    <!-- 이벤트및 서비스안내 수신동의-->
+    <input type="checkbox" asp-for="PolicyAgree.SMSEMail" class="policyCheck" />
+    <label asp-for="PolicyAgree.SMSEMail">이벤트 및 서비스안내 수신동의 <span>(선택)</span></label>
+    <div class="policyDataBox">
+        <partial name="/Views/Policy/_SMSEMailPolicy.cshtml" />
+    </div>
+</div>

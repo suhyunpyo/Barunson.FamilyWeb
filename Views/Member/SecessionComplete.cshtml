@@ -1,0 +1,31 @@
+﻿@model MemberSecessionComplete
+<partial name="~/Views/Shared/_HeaderPartial.cshtml" for="RefererSite" />
+<section class="register secession_complete">
+    <div class="area">
+        <h1>바른 ONE 회원탈퇴</h1>
+        <div class="secession_complete_box">
+            <h2>그 동안 바른컴퍼니의 서비스를 이용해 주셔서 감사합니다</h2>
+            <div class="goodbye_section">
+                <!-- 탈퇴안내 -->
+                <div class="goodbye_box">
+                    <p class="goodbye_text01">
+                        앞으로도 고객 여러분의 말씀에 귀 기울이며 <br>
+                        <strong>최고의 서비스를 제공하도록 노력하겠습니다</strong>
+                    </p>
+                    <p>
+                        고객님의 회원 탈퇴가 정상적으로 처리되었습니다.<br>
+                        답변해 주신 내용에 대해 깊이 고민하며 더욱 발전된 서비스를 제공하기 위해<br>
+                        노력하는 <strong class="point">바른컴퍼니</strong>가 되겠습니다.<br>
+                    </p>
+                    <p>감사합니다.</p>
+                </div>
+                <!-- / 탈퇴안내 -->
+                <!-- 하단버튼 -->
+                <div class="btn_box big type01">
+                    <a href="@Model.ReturnUrl" class="btn type02">메인으로 가기</a>
+                </div>
+                <!-- / 하단버튼 -->
+            </div>
+        </div>
+    </div>
+</section>

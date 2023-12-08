@@ -1,8 +1,35 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+﻿@model ResponseBaseModel
+@inject List<SiteInfo> SiteInfos
+@* 헤더 영역 *@
+<partial name="~/Views/Shared/_HeaderPartial.cshtml" for="RefererSite" />
+<section class="welcome">
+	<div class="area">
+		<div class="contents_box">
+			<div class="contents">
+				<dl>
+					<dt>바른 ONE 운영 안내</dt>
+					<dd>
+						바른 ONE 회원으로 자동 가입되며 바른컴퍼니의 패밀리 사이트에서 제공하는 <br class="m_none" />
+						다양한 서비스를 하나의 아이디로 이용 및 구매할 수 있습니다.
+					</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+</section>
+<section class="barunnfamily">
+	<div class="area">
+		<h2>바른컴퍼니 패밀리 사이트</h2>
+		<ul class="barunnfamily_list">
+			@foreach (var site in SiteInfos.Where(m => m.IsShow))
+			{
+				<li>
+					<a href="@site.SiteUrl" target="_blank" title="@site.Brand">
+						<img src="@site.LogUrl" alt="@site.Brand">
+						<p>@site.Description</p>
+					</a>
+				</li>
+			}
+		</ul>
+	</div>
+</section>

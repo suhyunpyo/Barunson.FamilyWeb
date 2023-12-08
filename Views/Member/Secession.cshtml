@@ -1,0 +1,117 @@
+﻿@model MemberSecessionModel
+@{
+    var goUrl = Model.RefererSite.SiteUrl;
+    if (Model.IsMobile)
+    {
+        goUrl = Model.RefererSite.MobileSiteUrl;
+    }
+}
+<partial name="~/Views/Shared/_HeaderPartial.cshtml" for="RefererSite" />
+<section class="register secession_complete">
+    <div class="area">
+        <h1>바른 ONE 회원탈퇴</h1>
+        <div class="secession_complete_box">
+            <div class="goodbye_section type02">
+                <h2>회원탈퇴 안내</h2>
+                <!-- 탈퇴안내 -->
+                <div class="goodbye_box dash">
+                    <p>
+                        바른 ONE 회원을 탈퇴하시면 <strong>바른컴퍼니의 패밀리 사이트 전체에서 탈퇴 처리</strong>가 됩니다. <br>
+                        (바른컴퍼니 패밀리 사이트는 바른손카드, 프리미어페이퍼, 바른손엠카드, 바른손지샵 4곳의 사이트가 해당됩니다.)
+                    </p>
+                    <p>회원탈퇴 시 보유하고 있는 <strong>할인쿠폰 및 서비스는 자동소멸</strong>되며 재가입 시 복구되지 않습니다.</p>
+                    <p>회원탈퇴 시 개인정보는 <strong>소비자보호에 관한 법률에 의거, 개인정보보호정책에 따라 관리</strong>됩니다.</p>
+                </div>
+                <!-- / 탈퇴안내 -->
+                <form asp-action="SecessionSave" method="post" class="frmSecession">
+                    @Html.AntiForgeryToken()
+                    <ul class="form_check_list">
+                    @for (var i = 0; i < Model.SecessionCause.Count; i++)
+                    {
+                        <li>
+                            <div class="form_checkbox">
+                                <input asp-for="@Model.SecessionCause[i].Selected" type="checkbox" class="chkCause" data-code="@Model.SecessionCause[i].Value" />
+                                <label asp-for="@Model.SecessionCause[i].Selected">@Model.SecessionCause[i].Text</label>
+                                <input asp-for="@Model.SecessionCause[i].Value" type="hidden" />
+                                <input asp-for="@Model.SecessionCause[i].Text" type="hidden" />
+                            </div>
+                        </li>
+                    }
+                    </ul>
+                    <div>
+                        <textarea asp-for="EtcComment" class="txtCause"></textarea>
+                    </div>
+                    <input type="hidden" asp-for="CertId" />
+                    <input type="hidden" asp-for="ReturnUrl" class="returnUrl" />
+                </form>
+                <div class="btn_box big type02">
+                    <button type="button" class="btn type02 save_btn">탈퇴하기</button>
+                    <button type="button" class="btn type01 cancel_btn" data-href="@goUrl">취소하기</button>
+                </div>
+                <div>
+                    <span class="field-validation-error">@Model.ValidMessage</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(function () {
+            $(".chkCause").on('change', function () {
+                if ($(this).data('code') == "117007") {
+                    if ($(this).prop("checked")) {
+                        $('.txtCause').show();
+                    } else {
+                        $('.txtCause').hide();
+                    }
+                }
+            });
+
+            $('.save_btn').on('click', function () {
+                $(".field-validation-error").html('');
+                if ($(".chkCause:checked").length == 0) {
+                    $(".field-validation-error").html('탈퇴 사유를 선택해주세요.');
+                    return;
+                }
+                if ($(".chkCause[data-code=117007]").prop("checked")) {
+                    var sEtcComment = $.trim($(".txtCause").val());
+                    if (sEtcComment == "") {
+                        $(".field-validation-error").html("기타 사유의 내용을 입력해주세요");
+                        return;
+                    }
+                }
+
+                var conf = {
+                    title: "",
+                    typeAnimated: true,
+                    boxWidth: '400px',
+                    useBootstrap: false,
+                    content: '통합 회원을 탈퇴하시면 바른컴퍼니의<br />모든 패밀리 사이트를 이용하실 수 없습니다.<br />탈퇴하시겠습니까?',
+                    buttons: {
+                        "예": {
+                            btnClass: 'btn-blue',
+                            action: function () {
+                                $('.frmSecession').trigger('submit');
+                            },
+                        },
+                        "아니요": {
+                            action: function () {
+                            }
+                        }
+                    }
+                };
+                $.confirm(conf);
+
+            });
+
+            $('.cancel_btn').on('click', function () {
+                window.location.href = $(this).data('href');
+            });
+
+            $(".chkCause").trigger('change');
+        });
+
+    </script>
+}

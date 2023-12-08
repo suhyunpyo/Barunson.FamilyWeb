@@ -1,0 +1,35 @@
+﻿@model NiceResponseStatusModel
+@{
+	Layout = null;
+}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="shortcut icon" href="https://static.barunsoncard.com/barunnfamily/logo/shortcut.ico">
+	<title>@ViewData["Title"]</title>
+</head>
+<body>
+	<input type="hidden" asp-for="IsSuccess" class="IsSuccess" />
+	<input type="hidden" asp-for="Message" class="messagetext" />
+	<input type="hidden" asp-for="ActionUrl" class="actionUrl" />
+
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+	<script>
+		$(function () {
+			var isSuccess = $("input.IsSuccess").val();
+			if (isSuccess == "True" || isSuccess == "true") {
+				var url = $("input.actionUrl").val();
+				window.opener.location.href = url;
+				window.close();
+			} else {
+				$.alert($("input.messagetext").val());
+				window.close();
+			}
+		});
+	</script>
+</body>
+</html>

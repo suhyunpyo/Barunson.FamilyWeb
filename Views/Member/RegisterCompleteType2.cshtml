@@ -1,0 +1,54 @@
+﻿@model MemberCompleteModel
+@{
+	var btnName = "제작하러 가기";
+	if (Model.RefererSite.SiteGubun == "GS")
+	{
+		btnName = "쇼핑하러 가기";
+	}
+}
+<partial name="~/Views/Shared/_HeaderPartial.cshtml" for="RefererSite" />
+<section class="register type02">
+	<div class="area">
+		<div class="contents_box">
+			<div class="title">
+				<h1>회원가입</h1>
+
+				<div class="step_view">
+					<ol>
+						<li>
+							<span>1</span>
+							<p>본인인증</p>
+						</li>
+						<li>
+							<span>2</span>
+							<p>정보입력</p>
+						</li>
+						<li class="on">
+							<span>3</span>
+							<p>가입완료</p>
+						</li>
+					</ol>
+				</div>
+			</div>
+			<div class="register_complete">
+				<div class="register_text_wrap">
+					<div>
+						<p class="register_text">
+							바른컴퍼니의 <br>
+							모든 서비스를 하나의 아이디로 <br>
+							사용하실 수 있습니다.
+						</p>
+					</div>
+
+				</div>
+				<div>
+					<a href="@Model.RefererSite.SiteUrl" class="register_btn">@btnName</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+@section Scripts {
+	<script>
+	</script>
+}

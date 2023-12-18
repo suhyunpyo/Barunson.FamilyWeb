@@ -15,13 +15,14 @@ namespace Barunson.FamilyWeb.Controllers
 		protected readonly BarunsonContext _barunsonDb;
 		protected readonly BarShopContext _barshopDb;
         protected readonly List<SiteInfo> _siteInfos;
-        
-		/// <summary>
+        protected readonly SiteConfig _siteConfig;
+
+        /// <summary>
         /// 참조 사이트 정보
         /// </summary>
         protected SiteInfo RefererSite { get; private set; }
 
-		public BaseController(ILogger logger, BarunsonContext barunsonDb, BarShopContext barshopDb, List<SiteInfo> siteInfos)
+		public BaseController(ILogger logger, BarunsonContext barunsonDb, BarShopContext barshopDb, List<SiteInfo> siteInfos, SiteConfig siteConfig)
 		{
 			_logger = logger;
 			
@@ -29,6 +30,7 @@ namespace Barunson.FamilyWeb.Controllers
 			_barshopDb = barshopDb;
 			_siteInfos = siteInfos;
 			RefererSite = _siteInfos.First(m => m.Name == "barunsoncard");
+			_siteConfig = siteConfig;
 		}
 
 		/// <summary>

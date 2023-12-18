@@ -43,8 +43,8 @@
                             <div class="register_box">
                                 <div class="grid_box type_date">
                                     <div>
-                                        <input asp-for="BirthDay" type="text" readonly="readonly" data-toggle="datepicker" />
-                                        <span asp-validation-for="BirthDay"></span>
+                                        @Model.BirthDay?.ToString("yyyy-MM-dd")
+                                        <input asp-for="BirthDay" type="hidden" />
                                     </div>
                                     <div class="form_radio">
                                         @foreach (var rd in Model.SolarOrLunarSelect)
@@ -142,11 +142,13 @@
                                         @foreach (var item in Model.WeddingHallTypeSelect)
                                         {
                                             <li>
-                                                <input type="radio" asp-for="WeddingHallType" value="@item.Value" id="WeddingHallType_@item.Value" />
+                                                <input type="radio" value="@item.Value" id="WeddingHallType_@item.Value" name="rbweddhalltype"
+                                                       "@((item.Value == Model.WeddingHallType) ? " checked=checked" : "")" />
                                                 <label for="WeddingHallType_@item.Value">@item.Text</label>
                                             </li>
                                         }
                                     </ul>
+                                    <input type="hidden" asp-for="WeddingHallType" class="hdweddhalltype" />
                                     <span asp-validation-for="WeddingHallType"></span>
                                 </div>
                             
@@ -175,7 +177,7 @@
                 <div class="barunnfamily_notice">
                     <dl>
                         <dt>알고 계세요</dt>
-                        <dd>청첩장 및 감사장 할인쿠폰은 약관 전체 동의 시 발급됩니다.</dd>
+                        <dd>청첩장 10,000원 및 감사장(15%) 할인쿠폰은 약관 전체 동의 시 발급됩니다.</dd>
                     </dl>
 				</div>
                 <!--배너-->
@@ -331,11 +333,63 @@
             } else {
                 $('.member_slide').hide();
             }
+            //weddhalltype select
+            $("input[name=rbweddhalltype]").on('click', function () {
+                var item = $('.hdweddhalltype');
+                $(item).val($('input[name=rbweddhalltype]:checked').val());
+                $('span[data-valmsg-for="' + $(item).attr('name') + '"]').html('');
+                $('span[data-valmsg-for="' + $(item).attr('name') + '"]').remove('field-validation-error')
+            });
+            var checkWeddhallType = function () {
+                var item = $('.hdweddhalltype');
+                var selectVal = $(item).val();
+                if (selectVal == "") {
+                    var msg = $(item).data('val-required');
+                    $('span[data-valmsg-for="' + $(item).attr('name') + '"]').html('<span>' + msg + '</span>');
+                    $('span[data-valmsg-for="' + $(item).attr('name') + '"]').addClass('field-validation-error')
+                    $('div.validesummary ul').append('<li>' + msg + '</li>');
 
+                    return false;
+                }
+                else
+                    return true;
+            }
+
+            //필수약관 동의 여부 확인
+            $(".mustbetrue").on('change', function () {
+                var item = $(this);
+                if (item.is(':checked')) {
+                    $('span[data-valmsg-for="' + $(item).attr('name') + '"]').html('');
+                    $('span[data-valmsg-for="' + $(item).attr('name') + '"]').remove('field-validation-error')
+                } else {
+                    var msg = $(item).data('val-mustbetrue');
+                    $('span[data-valmsg-for="' + $(item).attr('name') + '"]').html('<span>' + msg + '</span>');
+                    $('span[data-valmsg-for="' + $(item).attr('name') + '"]').addClass('field-validation-error')
+                }
+            });
+
+            var checkTerms = function () {
+                var $unchecked = $(".mustbetrue").filter(':not(:checked)');
+                var r = $unchecked.length == 0;
+                if (!r) {
+                    $unchecked.each(function (index, item) {
+                        var msg = $(item).data('val-mustbetrue');
+                        $('span[data-valmsg-for="' + $(item).attr('name') + '"]').html('<span>' + msg + '</span>');
+                        $('span[data-valmsg-for="' + $(item).attr('name') + '"]').addClass('field-validation-error')
+                        $('div.validesummary ul').append('<li>' + msg + '</li>');
+                       
+                    });
+                }
+                return r;
+            }
+            
             $('.register_btn').on('click', function () {
+                $('div.validesummary ul').empty();
                 var check = $('.frmRegist').valid();
-                console.log('form vaild check:' + check);
-                if (check) {
+                var checweddType = checkWeddhallType();
+                var checkTerm = checkTerms();
+                
+                if (check & checweddType  & checkTerm) {
                     var agreeAll = $(".policiesAgreeAll").is(":checked");
                     if ($('input.siteGubun').val() == "SB" && agreeAll == false) {  //바른손 카드만,
                         var conf = {
@@ -385,23 +439,17 @@
             
             
         });
+        jQuery.validator.addMethod("mustbetrue", function (value, element, param) {
+            console.log($(element).is(':checked'));
 
-        $(function ($) {
-            $.validator.addMethod("mustbetrue", function (value, element, param) {
-                console.log($(element).is(':checked'));
-
-                if ($(element).is(':checked')) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            });
-
-            $.validator.unobtrusive.adapters.add('mustbetrue', [], function (options) {
-                options.rules['mustbetrue'] = "#" + options.element.name.replace('.', '_');
-                options.messages['mustbetrue'] = options.message;
-            });
-        }(jQuery));
+            if ($(element).is(':checked')) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        });
+        jQuery.validator.unobtrusive.adapters.addBool("mustbetrue");
+        
 	</script>
 }

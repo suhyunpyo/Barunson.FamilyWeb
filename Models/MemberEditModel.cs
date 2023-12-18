@@ -50,7 +50,7 @@ namespace Barunson.FamilyWeb.Models
         [Display(Name = "비밀번호", Prompt = "영문으로 시작하는 6~16자의 영문+숫자 조합")]
         [Required(ErrorMessage = "비밀번호를 입력해주세요")]
         [StringLength(16, MinimumLength = 6, ErrorMessage = "{0}는 {2}~{1}문자여야 합니다. ")]
-        [RegularExpression(@"^[A-Za-z](?=.*[A-Za-z0-9_.!@#$%^&*])(?=.*\d).{5,}$", ErrorMessage = "비밀번호는 영문자로 시작하는 6~16자의 영문, 숫자, _.!@#$%^&*의 특수문자의 조합이여야 합니다.")]
+        [RegularExpression(@"^[A-Za-z](?!.*[\s])(?=.*[A-Za-z0-9])(?=.*\d).{5,}$", ErrorMessage = "비밀번호는 영문자로 시작하는 6~16자의 영문, 숫자, 특수문자(선택)의 조합이여야 합니다.")]
         public string Password { get; set; }
 
         /// <summary>
@@ -162,7 +162,8 @@ namespace Barunson.FamilyWeb.Models
         /// </summary>
         [Display(Name = "예식장")]
         [Required(ErrorMessage = "예식장을 선택해 주세요")]
-        public string WeddingHallType { get; set; } = "W";
+        public string WeddingHallType { get; set; } = "";
+
         /// <summary>
         /// 예식 장소
         /// </summary>
@@ -212,17 +213,7 @@ namespace Barunson.FamilyWeb.Models
                 return new SelectList(list.Select(x => new SelectListItem { Text = x, Value = x }), "Value", "Text");
             }
         }
-        /// <summary>
-        /// 이메일, 사용여부 검토 후 제거... 
-        /// </summary>
-        public IEnumerable<SelectListItem> EmailFooterSelect
-        {
-            get
-            {
-                var list = new List<string> { "직접입력", "gmail.com", "naver.com", "daum.net", "nate.com", "hanmail.net", "hotmail.com" };
-                return new SelectList(list.Select(x => new SelectListItem { Text = x, Value = x }), "Value", "Text");
-            }
-        }
+        
         /// <summary>
         /// 웨딩홀 타입
         /// </summary>
@@ -366,6 +357,9 @@ namespace Barunson.FamilyWeb.Models
             
         }
     }
+    /// <summary>
+    /// 회원탈퇴 완료 모델
+    /// </summary>
     public class MemberSecessionComplete : ResponseBaseModel
     {
         public MemberSecessionComplete(SiteInfo siteInfo) : base(siteInfo)

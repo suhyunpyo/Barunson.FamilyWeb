@@ -23,11 +23,17 @@ namespace Barunson.FamilyWeb.Service
 		Task<NiceCPCResponseData> GetDecoded(string tokenVersionId, string encData, string integrityValue);
 
 	}
-	public class NiceCPClientService: INiceCPClientService
+
+    /// <summary>
+    /// NICE 인증 서비스,
+    /// 내부 API 호출 privateapi.barunsoncard.com
+    /// </summary>
+    public class NiceCPClientService: INiceCPClientService
 	{
 		private readonly IHttpClientFactory _clientFactory;
 		private readonly Uri _url = new Uri("https://privateapi.barunsoncard.com");
 		private readonly JsonSerializerOptions jsonSerializerOptions;
+
 		#region 생성자
 		public NiceCPClientService(IHttpClientFactory httpClientFactory)
 		{  
@@ -35,7 +41,6 @@ namespace Barunson.FamilyWeb.Service
 			jsonSerializerOptions = new(JsonSerializerDefaults.Web);
 		}
 		#endregion
-
 
 		///---------------------------------------
 		/// <summary>

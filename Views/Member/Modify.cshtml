@@ -46,8 +46,8 @@
                             <div class="register_box">
                                 <div class="grid_box type_date">
                                     <div>
-                                        <input asp-for="BirthDay" type="text" readonly="readonly" data-toggle="datepicker" />
-                                        <span asp-validation-for="BirthDay"></span>
+                                        @Model.BirthDay?.ToString("yyyy-MM-dd")
+                                        <input asp-for="BirthDay" type="hidden" />
                                     </div>
                                     <div class="form_radio">
                                         @foreach (var rd in Model.SolarOrLunarSelect)

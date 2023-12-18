@@ -6,6 +6,9 @@
         goUrl = Model.RefererSite.MobileSiteUrl;
     }
 }
+@section Styles {
+    <link href="~/css/jconfirm_custom.css" rel="stylesheet" />
+}
 <partial name="~/Views/Shared/_HeaderPartial.cshtml" for="RefererSite" />
 <section class="register secession_complete">
     <div class="area">
@@ -86,7 +89,7 @@
                 var conf = {
                     title: "",
                     typeAnimated: true,
-                    boxWidth: '400px',
+                    boxWidth: '80%',
                     useBootstrap: false,
                     content: '통합 회원을 탈퇴하시면 바른컴퍼니의<br />모든 패밀리 사이트를 이용하실 수 없습니다.<br />탈퇴하시겠습니까?',
                     buttons: {

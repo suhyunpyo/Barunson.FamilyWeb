@@ -3,6 +3,7 @@ using Barunson.DbContext;
 using Barunson.FamilyWeb.Models;
 using Barunson.FamilyWeb.Service;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,8 +32,9 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<INiceCPClientService, NiceCPClientService>();
 builder.Services.AddScoped<IRouletteEventService, RouletteEventService>();
 builder.Services.AddSingleton<List<SiteInfo>>(builder.Configuration.GetSection("SiteInfos").Get<List<SiteInfo>>());
+builder.Services.AddSingleton<SiteConfig>(builder.Configuration.GetSection("SiteConfig").Get<SiteConfig>());
 
-builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+builder.Services.AddControllersWithViews();
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
@@ -41,7 +43,10 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+
+    //Application Gateway 사용으로 사용하지 않음.
+    //AG 외부 서비스시 아래 주석 제거
+    //app.UseHsts();
 }
 
 app.UseHttpsRedirection();

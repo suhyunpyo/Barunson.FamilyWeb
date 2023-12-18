@@ -9,18 +9,21 @@ using System.Text.Json;
 
 namespace Barunson.FamilyWeb.Controllers
 {
+	/// <summary>
+	/// Nice 인증 호출, Callback 
+	/// </summary>
     public class NcieCheckController : BaseController
 	{
 		private readonly INiceCPClientService _niceCPClientService;
-		public NcieCheckController(ILogger<MemberController> logger, BarunsonContext barunsonDb, BarShopContext barshopDb, List<SiteInfo> siteInfos, INiceCPClientService niceCPClientService)
-			: base(logger, barunsonDb, barshopDb, siteInfos)
+		public NcieCheckController(ILogger<MemberController> logger, BarunsonContext barunsonDb, BarShopContext barshopDb, List<SiteInfo> siteInfos, SiteConfig siteConfig, INiceCPClientService niceCPClientService)
+			: base(logger, barunsonDb, barshopDb, siteInfos, siteConfig)
 		{
 			_niceCPClientService = niceCPClientService;
 		}
 
 		public async Task<IActionResult> Call(NiceRequestCallBackModel reqData)
 		{
-			var callback = new Uri(Url.ActionLink("CallBack", "NcieCheck", reqData));
+			var callback = new Uri(Url.ActionLink("CallBack", "NcieCheck", reqData, protocol:_siteConfig.Protocol));
 			var model = new NiceRequestModel
 			{
 				NiceCheckUri = new Uri("https://nice.checkplus.co.kr/CheckPlusSafeModel/service.cb"),
@@ -93,7 +96,8 @@ namespace Barunson.FamilyWeb.Controllers
 						nationalinfo = niceResponse.nationalinfo,
 						BizCode = reqData.BizCode,
 						EventCode = reqData.EventCode,
-						Key = reqData.Key
+						Key = reqData.Key,
+						ConvertType = reqData.ConvertType,
 					};
 					var CertJson = JsonSerializer.Serialize(CertModel);
 					var CertData = Base64Convert.Encoded(CertJson);

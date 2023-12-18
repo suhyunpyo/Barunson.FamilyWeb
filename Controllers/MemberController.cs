@@ -12,28 +12,31 @@ namespace Barunson.FamilyWeb.Controllers
 {
     public class MemberController : BaseController
 	{
+        /// <summary>
+        /// 룰렛 서비스
+        /// </summary>
         private readonly IRouletteEventService _rouletteEventService;
-        public MemberController(ILogger<MemberController> logger, BarunsonContext barunsonDb, BarShopContext barshopDb, List<SiteInfo> siteInfos, IRouletteEventService rouletteEventService)
-			: base(logger, barunsonDb, barshopDb, siteInfos)
+
+        public MemberController(ILogger<MemberController> logger, BarunsonContext barunsonDb, BarShopContext barshopDb, List<SiteInfo> siteInfos, SiteConfig siteConfig, IRouletteEventService rouletteEventService)
+			: base(logger, barunsonDb, barshopDb, siteInfos, siteConfig)
 		{
             _rouletteEventService = rouletteEventService;
 		}
 		#region 회원 가입 진입 페이지
 
 		/// <summary>
-		/// 회원 가입
+		/// 회원 가입 진입 페이지
 		/// </summary>
 		/// <returns></returns>
 		[Route("[controller]", Order = 0)]
 		[Route("Member/Agreement.aspx", Order = 1)]
 		[Route("Member/Agreement_New.aspx", Order = 2)]
 		public IActionResult Index(string? site_code
-			, string? biz_code, string? event_code, string? key)
+			, string? biz_code, string? event_code, string? key
+            , string? converttype)
 		{
 			if (site_code != null)
-			{
 				SetRefererSite(site_code);
-			}
 
 			var viewName = "Index";
 			//모초, Gshop은 최소 동의만 
@@ -47,11 +50,13 @@ namespace Barunson.FamilyWeb.Controllers
 				//룰렛 이벤트
 				BizCode = biz_code,
 				EventCode = event_code,
-				Key = key
-			};
+				Key = key,
+                //회원전환 이벤트시
+                ConvertType = converttype
+            };
 			var model = new ResponseMemberModel(this.RefererSite)
 			{
-				NiceCheckUrl = new Uri(Url.ActionLink("Call", "NcieCheck", querys))
+				NiceCheckUrl = new Uri(Url.ActionLink("Call", "NcieCheck", querys, protocol: _siteConfig.Protocol))
 			};
 			
 			return View(viewName, model);
@@ -69,6 +74,7 @@ namespace Barunson.FamilyWeb.Controllers
 		#endregion
 
 		#region 공통 내부 함수
+
 		/// <summary>
 		/// 나이스 인증 결과 임시 저장 데이터 읽기
 		/// </summary>
@@ -81,7 +87,7 @@ namespace Barunson.FamilyWeb.Controllers
                         where m.CertID == certId.ToString() 
                         select m;
             var item = await query.FirstOrDefaultAsync();
-            if (item == null)
+            if (item == null || string.IsNullOrEmpty(item.CertData))
                 return null;
 
             var CertData = Base64Convert.Decoded(item.CertData);
@@ -89,24 +95,16 @@ namespace Barunson.FamilyWeb.Controllers
         }
 
         /// <summary>
-        /// 회원 수정등 회원 고유 정보 임시 저장 데이터 읽기
+        /// 회원 고유 정보 임시 저장 데이터 읽기
         /// </summary>
         /// <param name="certId"></param>
         /// <returns></returns>
         private async Task<string?> GetDupInfoCertification(Guid certId)
         {
-            var result = default(string?);
-
             var query = from m in _barshopDb.User_Certification_Log
                         where m.CertID == certId.ToString() 
-                        select m;
-            var item = await query.FirstOrDefaultAsync();
-            if (item != null)
-            {
-                result = item.DupInfo;
-            }
-            
-            return result;
+                        select m.DupInfo;
+            return await query.FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -122,6 +120,7 @@ namespace Barunson.FamilyWeb.Controllers
                         where m.uid == userId
                         select m;
             var count = await query.CountAsync();
+
             if (count == 0)
             {
                 var query2 = from m in _barshopDb.S2_UserBye
@@ -131,12 +130,17 @@ namespace Barunson.FamilyWeb.Controllers
             }
 			return count > 0;
         }
+
 		/// <summary>
 		/// 약관 목록
 		/// </summary>
 		/// <returns></returns>
 		private async Task<List<PolicyModel>> GetPolices()
 		{
+            /*
+             * 통합회원으로 관리하지만 진입 사이트에 따라 약관을 다르게 운영하는 것은 문제 있음.
+             * 통합약관으로 관리되도록 의사 결정 필요.
+             */
 			var result = new List<PolicyModel>();
 
 			var now = DateTime.Now.ToString("yyyy-MM-dd");
@@ -231,8 +235,11 @@ namespace Barunson.FamilyWeb.Controllers
         private S2_UserInfo_BHands FillUserInfoBHands(MemberCertificationModel certInfo, MemberRegModel model, DateTime now)
         {
             var splitPostCode = SplitPostCode(model.PostCode);
-            string siteCode = "SA";
-
+            //기존 SA 가 기본값이고 몰가입시에 B로 변경됨... SA는 중지된 사이트로 기본값 B로 설정
+            string siteCode = "B";
+            //몰에서 가입시에 Jehu 값 변경
+            string isJehu = (this.RefererSite.SiteGubun == "B") ? "Y": "N";
+            
             return new S2_UserInfo_BHands
             {
                 site_div = siteCode,
@@ -290,7 +297,7 @@ namespace Barunson.FamilyWeb.Controllers
                 INTERGRATION_DATE = now,
                 INTERGRATION_BEFORE_ID = model.UserId,
                 USE_YORN = "Y",
-                isJehu = "N",
+                isJehu = isJehu,
                 chk_sms = ConvertBoolToYN(model.PolicyAgree.SMSEMail),
                 chk_mailservice = ConvertBoolToYN(model.PolicyAgree.SMSEMail),
                 mkt_chk_flag = ConvertBoolToYN(model.PolicyAgree.ThirdParty),
@@ -613,7 +620,7 @@ namespace Barunson.FamilyWeb.Controllers
 
             #endregion
 
-            //인증 정보 삭제
+            //임시 저장된 인증 정보 삭제
             await _barshopDb.User_Certification_Log.Where(m => m.CertID == certId.ToString()).ExecuteDeleteAsync();
                        
             return model;
@@ -681,8 +688,8 @@ namespace Barunson.FamilyWeb.Controllers
             if (ModelState.IsValid)
 			{
                 //전처리.
-                if (model.TelNo2 == null) model.TelNo2 = "";
-                if (model.TelNo3 == null) model.TelNo3 = "";
+                model.TelNo2 ??= "";
+                model.TelNo3 ??= "";
                 model.PolicyAgree.ThirdParty = (model.PolicyAgree.ThirdPartyShinhan || model.PolicyAgree.ThirdPartyTelecom);
 
                 /* 신규 등록 분석....
@@ -746,14 +753,20 @@ namespace Barunson.FamilyWeb.Controllers
 					.SqlQuery<string?>($"select CONVERT(VARCHAR(200), PWDENCRYPT({model.Password}), 1) as [Value]")
 					.SingleOrDefaultAsync();
 
+                //입력 모델의 생일 정보를 변경되었을 경우 대비
+                model.BirthDay = certInfo.Birthdate;
+
 				Exception dbException = null;
 
 				using (var tran = await _barshopDb.Database.BeginTransactionAsync()) 
 				{
 					try
 					{
-                        //회원 생성
-						var uBhands = FillUserInfoBHands(certInfo, model, now);
+                        /* 회원 생성
+                         * 단일 테이블 단일 레코드로 개선 해야 함.
+                         */
+                        
+                        var uBhands = FillUserInfoBHands(certInfo, model, now);
                         uBhands.PWD = pwd;
                         _barshopDb.S2_UserInfo_BHands.Add(uBhands);
 
@@ -797,7 +810,7 @@ namespace Barunson.FamilyWeb.Controllers
                             _barshopDb.S4_Event_Raina.Add(eventRaina);
                         }
 
-                        //3자 동의 처리, S4_MARKETING_AGREEMENT_LOG 기록은 하지 않음.. 문제 발생시 기록해야 함.
+                        //3자 동의 처리, S4_MARKETING_AGREEMENT_LOG 기록은 하지 않음..만약 문제 발생시 기록해야 함.
                         if (model.PolicyAgree.ThirdParty)
                         {
                             var existsMktAgreeList = await (from m in _barshopDb.S2_USERINFO_THIRD_PARTY_MARKETING_AGREEMENT where m.UID == model.UserId select m).ToListAsync();
@@ -824,6 +837,18 @@ namespace Barunson.FamilyWeb.Controllers
                                 };
                                 _barshopDb.S2_USERINFO_THIRD_PARTY_MARKETING_AGREEMENT.Add(newThirdPartyTelecom);
                             }
+                        }
+
+                        // 회원 전환 이벤트 해당 시
+                        if (!string.IsNullOrEmpty(certInfo.ConvertType))
+                        {
+                            var userConvertEvent = new S2_UserInfo_ConvertEvent
+                            {
+                                uid = model.UserId,
+                                ConvertType = certInfo.ConvertType,
+                                RegDate = now
+                            };
+                            _barshopDb.S2_UserInfo_ConvertEvent.Add(userConvertEvent);
                         }
 
                         await _barshopDb.SaveChangesAsync();
@@ -873,17 +898,17 @@ namespace Barunson.FamilyWeb.Controllers
             }
             else
             {
-                if (ModelState[nameof(model.BirthDay)].Errors.Count > 0)
-                {
-                    ModelState[nameof(model.BirthDay)].Errors.Clear();
-                    ModelState.AddModelError(nameof(model.BirthDay), "생년월일 날짜가 잘못되었습니다.");
-                }
                 if (ModelState[nameof(model.WeddingDay)].Errors.Count > 0)
                 {
                     ModelState[nameof(model.WeddingDay)].Errors.Clear();
                     ModelState.AddModelError(nameof(model.WeddingDay), "예식일 날짜가 잘못되었습니다.");
                 }
-                
+                if (ModelState[nameof(model.WeddingHallType)].Errors.Count > 0)
+                {
+                    ModelState[nameof(model.WeddingHallType)].Errors.Clear();
+                    ModelState.AddModelError(nameof(model.WeddingHallType), "예식장을 선택해 주세요");
+                }
+
             }
 
             //모델 유효성 검사 실패로 모델 바인딩 기본 값을 다시 채워 뷰 페이지 출력
@@ -972,8 +997,10 @@ namespace Barunson.FamilyWeb.Controllers
             try
             {
                 // 접속 사이트 구분은 returnurl로 사이트 구분 하고 있음. 
-                // 모초는 returnurl 전달하지 않아 barunsoncard로 처리 되고 있음. 수정 필요
+                // 모초는 returnurl 전달하지 않아 barunsoncard로 처리 되고 있음. 
                 // Gshop은 &ReturnUrl=&SiteDiv=GS 으로 전달
+
+                // 모든 사이트에서 수정시 siteDiv를 전달하는 방식으로 수정 필요.
                 SiteInfo? rsite = null;
                 if (!string.IsNullOrEmpty(SiteDiv))
                 {
@@ -1109,7 +1136,6 @@ namespace Barunson.FamilyWeb.Controllers
                             item.hand_phone3 = model.MoTelNo3;
                             item.chk_sms = ConvertBoolToYN(model.CheckSMS);
                             item.chk_mailservice = ConvertBoolToYN(model.CheckEMail);
-                            item.birth = model.BirthDay?.ToString("yyyy-MM-dd");
                             item.birth_div = model.SolarOrLunar;
                             item.wedd_year = model.WeddingDay.Year.ToString();
                             item.wedd_month = model.WeddingDay.ToString("MM");
@@ -1134,7 +1160,6 @@ namespace Barunson.FamilyWeb.Controllers
                             item.hand_phone3 = model.MoTelNo3;
                             item.chk_sms = ConvertBoolToYN(model.CheckSMS);
                             item.chk_mailservice = ConvertBoolToYN(model.CheckEMail);
-                            item.birth = model.BirthDay?.ToString("yyyy-MM-dd");
                             item.birth_div = model.SolarOrLunar;
                             item.wedd_year = model.WeddingDay.Year.ToString();
                             item.wedd_month = model.WeddingDay.ToString("MM");
@@ -1159,7 +1184,6 @@ namespace Barunson.FamilyWeb.Controllers
                             item.hand_phone3 = model.MoTelNo3;
                             item.chk_sms = ConvertBoolToYN(model.CheckSMS);
                             item.chk_mailservice = ConvertBoolToYN(model.CheckEMail);
-                            item.birth = model.BirthDay?.ToString("yyyy-MM-dd");
                             item.birth_div = model.SolarOrLunar;
                             item.wedd_year = model.WeddingDay.Year.ToString();
                             item.wedd_month = model.WeddingDay.ToString("MM");
@@ -1209,11 +1233,7 @@ namespace Barunson.FamilyWeb.Controllers
             }
             else
             {
-                if (ModelState[nameof(model.BirthDay)].Errors.Count > 0)
-                {
-                    ModelState[nameof(model.BirthDay)].Errors.Clear();
-                    ModelState.AddModelError(nameof(model.BirthDay), "생년월일 날짜가 잘못되었습니다.");
-                }
+                
                 if (ModelState[nameof(model.WeddingDay)].Errors.Count > 0)
                 {
                     ModelState[nameof(model.WeddingDay)].Errors.Clear();
@@ -1374,6 +1394,11 @@ namespace Barunson.FamilyWeb.Controllers
                         await _barshopDb.S2_UserInfo_BHands.Where(m => m.DupInfo == dupInfo).ExecuteDeleteAsync();
                         await _barshopDb.S2_UserInfo_TheCard.Where(m => m.DupInfo == dupInfo).ExecuteDeleteAsync();
                         await _barshopDb.S2_UserInfo_Jehu.Where(m => m.UserId == uid).ExecuteDeleteAsync();
+
+                        await _barshopDb.S2_USERINFO_SIGNUP_DEVICE.Where(m => m.DUPINFO == dupInfo).ExecuteDeleteAsync();
+                        await _barshopDb.S4_Event_Raina.Where(m => m.uid == uid).ExecuteDeleteAsync();
+                        await _barshopDb.S2_UserInfo_ConvertEvent.Where(m => m.uid == uid).ExecuteDeleteAsync();
+                        await _barshopDb.S2_USERINFO_THIRD_PARTY_MARKETING_AGREEMENT.Where(m => m.UID == uid).ExecuteDeleteAsync();
 
                         await tran.CommitAsync();
                         isSuccess = true;

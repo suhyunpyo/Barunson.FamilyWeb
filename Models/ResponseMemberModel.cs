@@ -63,5 +63,10 @@
         public string? BizCode { get; set; }
 		public string? EventCode { get; set; }
 		public string? Key { get; set; }
-	}
+
+        /// <summary>
+        /// 비회원에서 회원전환시 이벤트가 있을경우 이벤트 코드
+        /// </summary>
+        public string? ConvertType { get; set; }
+    }
 }

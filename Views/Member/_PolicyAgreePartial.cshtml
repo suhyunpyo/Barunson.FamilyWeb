@@ -7,20 +7,20 @@
 </div>
 <div class="form_checkbox">
     <!-- 만 14세 이상 가입동의-->
-    <input type="checkbox" asp-for="PolicyAgree.Age" class="policyCheck" />
+    <input type="checkbox" asp-for="PolicyAgree.Age" class="policyCheck mustbetrue" />
     <label asp-for="PolicyAgree.Age">만 14세 이상입니다. <span>(필수)</span></label>
     <span asp-validation-for="PolicyAgree.Age"></span>
 </div>
 <div id="div_PolicyAgree_User" class="form_checkbox">
     <!-- 바른컴퍼니 바른 ONE 서비스 이용약관동의-->
-    <input type="checkbox" asp-for="PolicyAgree.User" class="policyCheck" />
+    <input type="checkbox" asp-for="PolicyAgree.User" class="policyCheck mustbetrue" />
     <label asp-for="PolicyAgree.User">이용약관 동의 <span>(필수)</span></label>
     <button type="button" class="policyAgreeBtn" data-viewid="div_PolicyAgree_User">+</button>
     <span asp-validation-for="PolicyAgree.User"></span>
 </div>
 <div id="div_PolicyAgree_Essential" class="form_checkbox">
-    <!-- 개인정보 수집 이용 동의-->
-    <input type="checkbox" asp-for="PolicyAgree.Essential" class="policyCheck" />
+    <!-- 개인정보 수집 이용 동의--> 
+    <input type="checkbox" asp-for="PolicyAgree.Essential" class="policyCheck mustbetrue" />
     <label asp-for="PolicyAgree.Essential">개인정보 수집 이용 동의 <span>(필수)</span></label>
     <button type="button" class="policyAgreeBtn" data-viewid="div_PolicyAgree_Essential">+</button>
     <span asp-validation-for="PolicyAgree.Essential"></span>

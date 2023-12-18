@@ -4,6 +4,9 @@ using System.Text.Json;
 
 namespace Barunson.FamilyWeb.Service
 {
+    /// <summary>
+    /// 룰렛 서비스 API 호출
+    /// </summary>
     public interface IRouletteEventService
     {
         Task<RouletteResponseMessage> Send(RouletteEvent postData);

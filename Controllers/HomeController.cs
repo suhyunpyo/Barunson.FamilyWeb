@@ -8,14 +8,14 @@ namespace Barunson.FamilyWeb.Controllers
     public class HomeController : BaseController
 	{
 
-        public HomeController(ILogger<HomeController> logger, BarunsonContext barunsonDb, BarShopContext barshopDb, List<SiteInfo> siteInfos) 
-            : base(logger, barunsonDb, barshopDb, siteInfos)
+        public HomeController(ILogger<HomeController> logger, BarunsonContext barunsonDb, BarShopContext barshopDb, List<SiteInfo> siteInfos, SiteConfig siteConfig) 
+            : base(logger, barunsonDb, barshopDb, siteInfos, siteConfig)
         {
             
         }
 		/// <summary>
 		/// 통합회원 Home page
-		/// DupInfo or certID 값이 query로 전달될경우 통합회원 전환필요한 회원임.
+		/// DupInfo or certID 값이 query로 전달될경우 통합회원 전환필요한 회원이나, 구현하지 않음.  
 		/// </summary>
 		/// <param name="site_code"></param>
 		/// <returns></returns>

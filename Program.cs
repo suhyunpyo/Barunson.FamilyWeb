@@ -35,6 +35,7 @@ builder.Services.AddSingleton<List<SiteInfo>>(builder.Configuration.GetSection("
 builder.Services.AddSingleton<SiteConfig>(builder.Configuration.GetSection("SiteConfig").Get<SiteConfig>());
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
